@@ -1,0 +1,44 @@
+// Starter Template 
+// import(s) at top of program b4 class line
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class sword extends JFrame{ 
+  //Variable and GUIObject Declaration area 
+  
+  MyDrawPanel p1=new MyDrawPanel();
+  
+  public static void main(String[ ] args) 
+  {
+    new sword();
+  }  
+  
+  public sword (){
+    //Create object and your code goes here
+    
+    this.add(p1);
+    this.setSize(600,600);
+    this.setVisible(true);
+    
+  } 
+  
+  
+  class MyDrawPanel extends JPanel {
+    public void paintComponent(Graphics g) {
+
+      Graphics2D g2 = (Graphics2D)g;
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      
+      //blade
+      g2.drawLine(200,200,200,300);
+
+    }
+  }
+}
+
+
+
+
