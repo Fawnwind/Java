@@ -25,6 +25,7 @@ public class calendar2 extends JFrame implements ActionListener{
   JPanel p3 = new JPanel();
   JPanel p4 = new JPanel();
 
+
   JPanel right1 = new JPanel();
 
   DefaultListModel listmain = new DefaultListModel();
@@ -32,6 +33,8 @@ public class calendar2 extends JFrame implements ActionListener{
   JScrollPane scroll1 = new JScrollPane(list1);
 
   int dayint = 0;
+  int monthint = 0;
+  int teacherint = 0;
 
   String[] daytxt = {"Monday","Tuesday","Wensday","Thursday","Friday"};
 
@@ -85,7 +88,7 @@ public class calendar2 extends JFrame implements ActionListener{
     p3.setBorder(BorderFactory.createEmptyBorder(8,0,0,0));
     p4.setBorder(BorderFactory.createEmptyBorder(2,5,8,5));
     p0.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
-    right1.setBorder(BorderFactory.createEmptyBorder(5,5,230,5));
+    right1.setBorder(BorderFactory.createEmptyBorder(85,5,150,5));
 
     left.addActionListener(this);
     right.addActionListener(this);
@@ -153,7 +156,9 @@ public class calendar2 extends JFrame implements ActionListener{
 
 
 
-
+    int monthint = monthbox.getSelectedIndex();
+    int teacherint = teacherbox.getSelectedIndex();
+    read();
 
 
 
@@ -174,10 +179,31 @@ public class calendar2 extends JFrame implements ActionListener{
       day.setText(daytxt[dayint]);
       read();
     }
+
     else if (e.getSource()==add)
     {
       listmain.addElement(event_t.getText() + ", " + time_t.getText() + ", " + location_t.getText() + ", " + other_t.getText());
+      write();
     }
+
+    else if (e.getSource()== delete)
+    {
+      if (list1.getSelectedIndex()>=0)
+      {
+        listmain.removeElementAt(list1.getSelectedIndex());
+      }
+      write();
+    }
+
+    else if (e.getSource()== edit)
+    {
+      if (list1.getSelectedIndex()>=0)
+      {
+        listmain.setElementAt(event_t.getText() + ", " + time_t.getText() + ", " + location_t.getText() + ", " + other_t.getText(), list1.getSelectedIndex());
+      }
+      write();
+    }
+
     else if (e.getSource()==right)
     {
       if (dayint == 4){
@@ -189,19 +215,24 @@ public class calendar2 extends JFrame implements ActionListener{
      day.setText(daytxt[dayint]);
      read();
     }
+
     else if (e.getSource()==close)
     {
       System.exit(1);
     }
+
     else if (e.getSource()==teacherbox)
     {
       t_index = teacherbox.getSelectedIndex();
       System.out.println(t_index);
+      read();
     }
+
     else if (e.getSource()==monthbox)
     {
       m_index = monthbox.getSelectedIndex();
       System.out.println(m_index);
+      read();
     }
   }
 
@@ -216,36 +247,46 @@ public class calendar2 extends JFrame implements ActionListener{
 
 
   public void read(){
+
     try
     {
-      in=new BufferedReader(new FileReader(daytxt[dayint]+".txt"));
+      listmain.clear();
+      in=new BufferedReader(new FileReader(teacher[t_index] + month[m_index] + daytxt[dayint] + ".txt"));
       System.out.println("File Opening");
+
+      do
+      {
+        try{
+        line=in.readLine();
+        }
+        catch (IOException e)
+        {
+          System.out.println("Problem reading data from file");
+        }
+
+        if (line!=null)
+        {
+
+
+            listmain.addElement(line);
+
+
+        }
+      } while (line!=null);
     }
     catch (FileNotFoundException e)
     {
+
       System.out.println("Problem opening File");
     }
 
-    for (int i=0;i<10;i++)
-    {
-      try{
-        line=in.readLine();
-      }
-      catch (IOException e)
-      {
-        System.out.println("Problem reading data from file");
-      }
-
-
-    }
-    System.out.print("Reading...");
 
     try
     {
       in.close();
       System.out.println("Closing File");
     }
-    catch (IOException e)
+    catch (IOException | NullPointerException e )
     {
       System.out.println("Problem Closing "+e);
     }
@@ -258,20 +299,23 @@ public class calendar2 extends JFrame implements ActionListener{
 
     try
     {
-      out=new PrintWriter(new BufferedWriter(new FileWriter(daytxt[dayint]+".txt", false)),true);
-      // out=new PrintWriter(new BufferedWriter(new FileWriter(new File("h:NewDataFile.txt"), true)),true);
-      // add ,true parameter to the FileWriter for opening as APPEND
+      out=new PrintWriter(new BufferedWriter(new FileWriter(teacher[t_index] + month[m_index] + daytxt[dayint] + ".txt", false)),true);
       System.out.println("File Opening");
+
+      for (int i = 0; i<listmain.getSize();i++)
+      {
+        out.println(listmain.getElementAt(i));
+        System.out.println("1");
+      }
+
+
     }
     catch (IOException e)
     {
       System.out.println("Problem opening File");
     }
 
-    for (int i=0;i<10;i++)
-    {
 
-    }
     System.out.println("Saving...");
 
     out.close();
