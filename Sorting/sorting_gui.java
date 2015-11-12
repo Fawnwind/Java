@@ -11,6 +11,9 @@ public class sorting_gui extends JFrame implements ActionListener{
   JPanel main = new JPanel();
   JPanel list_p = new JPanel();
   JPanel right_p = new JPanel();
+  JPanel right_m = new JPanel();
+  JPanel right_t = new JPanel();
+
 
   DefaultListModel model_r = new DefaultListModel();
   JList list_r = new JList(model_r);
@@ -20,7 +23,7 @@ public class sorting_gui extends JFrame implements ActionListener{
   JList list_s = new JList(model_s);
   JScrollPane scroll_s = new JScrollPane(list_s);
 
-  String[] sorting_t = {"Bubble","Insert Selection","Quick Sort","Selection Exchange"};
+  String[] sorting_t = {"Bubble","Insert Selection","Quick Sort","Selection Exchange","Merge Sort"};
   String[] visual_t = {"Yes","No"};
 
   JComboBox sorting_pick_c = new JComboBox(sorting_t);
@@ -39,8 +42,13 @@ public class sorting_gui extends JFrame implements ActionListener{
   JTextField size_t = new JTextField("100");
   JTextField range_t = new JTextField("100");
 
+  Font font = new Font("Soge UI",Font.PLAIN,11);
+
+  JTextArea merge_t = new JTextArea("The Mergesort algorithm can be used to sort a collection of objects. Mergesort is so called divide and conquer algorithm. Divide and conquer algorithms divide the original data into smaller sets of data to solve the problem.");
+
 
   int[] numbers_r;
+  int[] helper;
   int size = 100;
   int range = 100;
   int temp = 0;
@@ -75,30 +83,42 @@ public class sorting_gui extends JFrame implements ActionListener{
 
   public sorting_gui (){
 
+    merge_t.setLineWrap(true);
+    merge_t.setWrapStyleWord(true);
+    merge_t.setFont(font);
+    merge_t.setEditable(false);
+
     gen_r.addActionListener(this);
     sort.addActionListener(this);
 
-    right_p.setBorder(BorderFactory.createEmptyBorder(10,3,80,3));
-    list_p.setBorder(BorderFactory.createEmptyBorder(3,3,3,0));
+    right_p.setBorder(BorderFactory.createEmptyBorder(10,3,0,3));
+    list_p.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+    right_t.setBorder(BorderFactory.createEmptyBorder(6,0,6,6));
 
     main.setLayout(new BorderLayout());
     list_p.setLayout(new GridLayout(1,2,3,3));
-    right_p.setLayout(new GridLayout(6,2,3,3));
+    right_p.setLayout(new GridLayout(5,2,3,3));
+    right_m.setLayout(new GridLayout(2,1,3,0));
+    right_t.setLayout(new GridLayout(1,1));
+
 
     Dimension right_d = new Dimension(250,300);
     right_p.setPreferredSize(right_d);
 
 
     main.add(list_p,BorderLayout.CENTER);
-    main.add(right_p,BorderLayout.EAST);
+    main.add(right_m,BorderLayout.EAST);
 
     list_p.add(scroll_r);
     list_p.add(scroll_s);
 
+    right_m.add(right_p);
+    right_m.add(right_t);
+
+    right_t.add(merge_t);
+
     right_p.add(sorting_pick_l);
     right_p.add(sorting_pick_c);
-    right_p.add(visual_l);
-    right_p.add(visual_c);
     right_p.add(time);
     right_p.add(swap_l);
     right_p.add(size_l);
@@ -126,6 +146,7 @@ public class sorting_gui extends JFrame implements ActionListener{
       range = Integer.parseInt(range_t.getText());
       model_r.clear();
       numbers_r = new int[size];
+      helper = new int[size];
       for (int i=0;i<size;i++)
       {
         Random r = new Random();
@@ -138,41 +159,37 @@ public class sorting_gui extends JFrame implements ActionListener{
 
       model_s.clear();
 
-      if (sorting_pick_c.getSelectedIndex() == 0)
+      if (sorting_pick_c.getSelectedIndex()==0)
       {
-        model_s.addElement("Processing...");
         Bubble();
-        model_s.clear();
       }
-      else if (sorting_pick_c.getSelectedIndex() == 1)
+      else if (sorting_pick_c.getSelectedIndex()==1)
       {
-        model_s.addElement("Processing...");
         Insert();
-        model_s.clear();
       }
-      else if (sorting_pick_c.getSelectedIndex() == 2)
+      else if (sorting_pick_c.getSelectedIndex()==2)
       {
-
+        //qsort(numbers_r,0,/*numbers_r.length*/100);
+        //for (int i=0;i<size;i++)
+        //{
+          //model_s.addElement(numbers_r[i]);
+        //}
       }
-      else if (sorting_pick_c.getSelectedIndex() == 3)
+      else if (sorting_pick_c.getSelectedIndex()==3)
       {
-
+        SelectEx();
       }
-
-      for (int i=0;i<size;i++)
+      else if (sorting_pick_c.getSelectedIndex()==4)
       {
-        model_s.addElement(numbers_r[i]);
+        mergesort(0,size-1);
+        for (int i=0;i<size;i++)
+        {
+          model_s.addElement(numbers_r[i]);
+        }
       }
+
     }
   }
-
-
-
-
-
-
-
-
 
   public void Bubble(){
 
@@ -190,20 +207,20 @@ public class sorting_gui extends JFrame implements ActionListener{
         m=0;
       }
     }
+    for (int i=0;i<size;i++)
+    {
+      model_s.addElement(numbers_r[i]);
+    }
   }
 
   public void Insert(){
-    int b[] = new int[size];
-    for (int i=0;i<size;i++)
-    {
-      b[i] = numbers_r[i];
-    }
+    int[] b = new int[size];
+
     b[0]=numbers_r[0];
 
     for (int m=1;m<size;m++){
       flag=0;
       for (int n=0;n<m;n++){
-
         if (numbers_r[m]<b[n]){
           flag=1;
           for (int o=m;o>n;o--){
@@ -216,12 +233,52 @@ public class sorting_gui extends JFrame implements ActionListener{
       if (flag==0)
         b[m]=numbers_r[m];
     }
+    for (int i=0;i<size;i++)
+    {
+      model_s.addElement(b[i]);
+    }
   }
-/*
+
+  public void mergesort(int low, int high) {
+    if (low < high) {
+      int middle = low + (high - low) / 2;
+      mergesort(low, middle);
+      mergesort(middle + 1, high);
+      merge(low, middle, high);
+    }
+  }
+
+  private void merge(int low, int middle, int high) {
+
+    for (int i = low; i <= high; i++) {
+      helper[i] = numbers_r[i];
+    }
+
+    int i = low;
+    int j = middle + 1;
+    int k = low;
+    while (i <= middle && j <= high) {
+      if (helper[i] <= helper[j]) {
+        numbers_r[k] = helper[i];
+        i++;
+      } else {
+        numbers_r[k] = helper[j];
+        j++;
+      }
+      k++;
+    }
+    while (i <= middle) {
+      numbers_r[k] = helper[i];
+      k++;
+      i++;
+    }
+  }
+
+
   public static void qsort(int a[], int start, int finish) {
     int lo = start;
-    int hi = finish+1;
-    int flag=0;
+    int hi = finish;
+    int flag = 0;
 
     if (lo >= hi) {
       return;
@@ -254,21 +311,27 @@ public class sorting_gui extends JFrame implements ActionListener{
     qsort(a, hi+1, finish);
   }
 
-  public static void SelectEx(){
-    for (int n=0;n<listlen;n++){
-    lowest=a[n];
+  public  void SelectEx(){
+    int lowpos = 0;
+    int lowest = 0;
+    for (int n=0;n<size;n++){
+    lowest=numbers_r[n];
     lowpos=n;
-    for (int m=n+1;m<listlen;m++){
-      if (a[m]<lowest){
-        lowest=a[m];
+    for (int m=n+1;m<size;m++){
+      if (numbers_r[m]<lowest){
+        lowest=numbers_r[m];
         lowpos=m;
       }
     }
-    temp=a[n];
-    a[n]=a[lowpos];
-    a[lowpos]=temp;
+    temp=numbers_r[n];
+    numbers_r[n]=numbers_r[lowpos];
+    numbers_r[lowpos]=temp;
     }
-  }*/
+    for (int i=0;i<size;i++)
+    {
+      model_s.addElement(numbers_r[i]);
+    }
+  }
 }
 
 
