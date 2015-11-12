@@ -23,7 +23,7 @@ public class sorting_gui extends JFrame implements ActionListener{
   JList list_s = new JList(model_s);
   JScrollPane scroll_s = new JScrollPane(list_s);
 
-  String[] sorting_t = {"Bubble","Insert Selection","Quick Sort","Selection Exchange","Merge Sort"};
+  String[] sorting_t = {"Bubble","Insert Selection","Quick Sort","Selection Exchange","Merge Sort","Double Bubble"};
   String[] visual_t = {"Yes","No"};
 
   JComboBox sorting_pick_c = new JComboBox(sorting_t);
@@ -32,12 +32,12 @@ public class sorting_gui extends JFrame implements ActionListener{
   JButton gen_r = new JButton("Gen Numbers");
   JButton sort = new JButton("Sort Numbers");
 
-  JLabel time = new JLabel("Time:");
-  JLabel swap_l = new JLabel("# Of Swaps:");
+  JLabel time = new JLabel("Time: 0 Mills");
+  JLabel swap_l = new JLabel("# Of Swaps: 0");
   JLabel sorting_pick_l = new JLabel("Sorting Type:");
   JLabel visual_l = new JLabel("Visualize:");
-  JLabel size_l = new JLabel("Size");
-  JLabel range_l = new JLabel("Range");
+  JLabel size_l = new JLabel("Size:");
+  JLabel range_l = new JLabel("Range:");
 
   JTextField size_t = new JTextField("100");
   JTextField range_t = new JTextField("100");
@@ -48,11 +48,16 @@ public class sorting_gui extends JFrame implements ActionListener{
 
 
   int[] numbers_r;
+  int[] numbers_r2;
   int[] helper;
   int size = 100;
   int range = 100;
   int temp = 0;
   int flag = 0;
+  int swaps = 0;
+
+  long time_b = 0;
+  long time_a = 0;
 
 
 
@@ -62,21 +67,21 @@ public class sorting_gui extends JFrame implements ActionListener{
   {
 
     try {
-            // Set System L&F
-        UIManager.setLookAndFeel(
-            UIManager.getSystemLookAndFeelClassName());
+      // Set System L&F
+      UIManager.setLookAndFeel(
+                               UIManager.getSystemLookAndFeelClassName());
     }
     catch (UnsupportedLookAndFeelException e) {
-       // handle exception
+      // handle exception
     }
     catch (ClassNotFoundException e) {
-       // handle exception
+      // handle exception
     }
     catch (InstantiationException e) {
-       // handle exception
+      // handle exception
     }
     catch (IllegalAccessException e) {
-       // handle exception
+      // handle exception
     }
     new sorting_gui();
   }
@@ -139,6 +144,7 @@ public class sorting_gui extends JFrame implements ActionListener{
 
   public void actionPerformed(ActionEvent e)
   {
+    time_b = System.currentTimeMillis();
     if (e.getSource() == gen_r)
     {
       sort.setEnabled(true);
@@ -153,6 +159,7 @@ public class sorting_gui extends JFrame implements ActionListener{
         numbers_r[i] = r.nextInt(range);
         model_r.addElement(numbers_r[i]);
       }
+      numbers_r2 = numbers_r.clone();
     }
     if (e.getSource() == sort)
     {
@@ -169,11 +176,11 @@ public class sorting_gui extends JFrame implements ActionListener{
       }
       else if (sorting_pick_c.getSelectedIndex()==2)
       {
-        //qsort(numbers_r,0,/*numbers_r.length*/100);
-        //for (int i=0;i<size;i++)
-        //{
-          //model_s.addElement(numbers_r[i]);
-        //}
+        qsort(numbers_r,0,numbers_r.length-1);
+        for (int i=0;i<size;i++)
+        {
+          model_s.addElement(numbers_r[i]);
+        }
       }
       else if (sorting_pick_c.getSelectedIndex()==3)
       {
@@ -187,8 +194,21 @@ public class sorting_gui extends JFrame implements ActionListener{
           model_s.addElement(numbers_r[i]);
         }
       }
+      else if (sorting_pick_c.getSelectedIndex()==5)
+      {
+        DoubleBubble();
+        for (int i=0;i<size;i++)
+        {
+          model_s.addElement(numbers_r[i]);
+        }
+      }
 
     }
+    time_a =  System.currentTimeMillis() - time_b;
+    time.setText("Time: "+time_a+" Mills");
+    swap_l.setText("# Of Swaps: "+swaps);
+    swaps = 0;
+    numbers_r = numbers_r2.clone();
   }
 
   public void Bubble(){
@@ -201,6 +221,7 @@ public class sorting_gui extends JFrame implements ActionListener{
           numbers_r[n+1]=numbers_r[n];
           numbers_r[n]=temp;
           flag=1;
+          swaps = swaps+1;
         }
       }
       if (flag==0){
@@ -225,8 +246,10 @@ public class sorting_gui extends JFrame implements ActionListener{
           flag=1;
           for (int o=m;o>n;o--){
             b[o]=b[o-1];
+            swaps = swaps+1;
           }
           b[n]=numbers_r[m];
+          swaps = swaps+1;
           n=m;
         }
       }
@@ -258,6 +281,7 @@ public class sorting_gui extends JFrame implements ActionListener{
     int j = middle + 1;
     int k = low;
     while (i <= middle && j <= high) {
+      swaps = swaps+1;
       if (helper[i] <= helper[j]) {
         numbers_r[k] = helper[i];
         i++;
@@ -269,15 +293,16 @@ public class sorting_gui extends JFrame implements ActionListener{
     }
     while (i <= middle) {
       numbers_r[k] = helper[i];
+      swaps = swaps+1;
       k++;
       i++;
     }
   }
 
 
-  public static void qsort(int a[], int start, int finish) {
+  public  void qsort(int a[], int start, int finish) {
     int lo = start;
-    int hi = finish;
+    int hi = finish+1;
     int flag = 0;
 
     if (lo >= hi) {
@@ -291,6 +316,7 @@ public class sorting_gui extends JFrame implements ActionListener{
         if (a[hi]<pivot){
           flag=1;
           a[lo]=a[hi];
+          swaps = swaps +1;
         }
 
       }
@@ -300,12 +326,14 @@ public class sorting_gui extends JFrame implements ActionListener{
         if (a[lo]>pivot){
           flag=1;
           a[hi]=a[lo];
+          swaps = swaps +1;
         }
       }
     }
     if (lo==hi)
     {
       a[hi]=pivot;
+      swaps = swaps +1;
     }
     qsort(a, start, lo-1);
     qsort(a, hi+1, finish);
@@ -315,23 +343,65 @@ public class sorting_gui extends JFrame implements ActionListener{
     int lowpos = 0;
     int lowest = 0;
     for (int n=0;n<size;n++){
-    lowest=numbers_r[n];
-    lowpos=n;
-    for (int m=n+1;m<size;m++){
-      if (numbers_r[m]<lowest){
-        lowest=numbers_r[m];
-        lowpos=m;
+      lowest=numbers_r[n];
+      lowpos=n;
+      for (int m=n+1;m<size;m++){
+        if (numbers_r[m]<lowest){
+          lowest=numbers_r[m];
+          swaps = swaps +1;
+          lowpos=m;
+        }
       }
-    }
-    temp=numbers_r[n];
-    numbers_r[n]=numbers_r[lowpos];
-    numbers_r[lowpos]=temp;
+      temp=numbers_r[n];
+      numbers_r[n]=numbers_r[lowpos];
+      numbers_r[lowpos]=temp;
+      swaps = swaps +1;
     }
     for (int i=0;i<size;i++)
     {
       model_s.addElement(numbers_r[i]);
     }
   }
+
+  public void DoubleBubble()
+  {
+    boolean swapped = true;
+    int i = 0;
+    int j = numbers_r.length - 1;
+    while(i < j && swapped)
+    {
+      swapped = false;
+      for(int k = i; k < j; k++)
+      {
+        if(numbers_r[k] > numbers_r[k + 1])
+        {
+          int temp = numbers_r[k];
+          numbers_r[k] = numbers_r[k + 1];
+          numbers_r[k + 1] = temp;
+          swapped = true;
+          swaps = swaps +1;
+        }
+      }
+      j--;
+      if(swapped)
+      {
+        swapped = false;
+        for(int k = j; k > i; k--)
+        {
+          if(numbers_r[k] < numbers_r[k - 1])
+          {
+            int temp = numbers_r[k];
+            swaps = swaps +1;
+            numbers_r[k] = numbers_r[k - 1];
+            numbers_r[k - 1] = temp;
+            swapped = true;
+          }
+        }
+      }
+      i++;
+    }
+  }
+
 }
 
 
