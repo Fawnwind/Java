@@ -8,15 +8,21 @@ import java.util.Random;
 public class visual extends JFrame implements ActionListener,Runnable
 {
 
-  String[] set = {"Merge Sort","Quick Sort","Bubble","Insert Selection","Selection Exchange","Double Bubble"};
+  String[] set = {"Merge Sort","Quick Sort","Bubble","Double Bubble","Selection Exchange"};
 
   MyDrawPanel draw1=new MyDrawPanel();
-
+  int sleep = 5;
   JPanel main = new JPanel();
   JPanel south = new JPanel();
 
   JButton gen = new JButton ("Gen");
   JButton sort = new JButton ("Sort");
+  JButton plus = new JButton("Speed + ");
+  JButton minus = new JButton("Speed - ");
+
+  String speed = ("Medium");
+
+  JLabel threadspeeed = new JLabel(" Speed");
 
   JComboBox select = new JComboBox(set);
 
@@ -25,45 +31,63 @@ public class visual extends JFrame implements ActionListener,Runnable
   int[] numbers = new int[size];
   int[] helper = new int[size];
   int counter = 0;
-  int sleep = 6;
+
   int swaps = 0;
   int flag = 0;
   int temp = 0;
   int nextsize = 0;
 
+  String sorting_t = "Standbye";
+  int gensort_i =0;
+  int dots =0;
+
+  String[] dots_t = {".","..","..."};
+
+  Color sky = new Color(0,0,0);
+
 
   public static void main(String[ ] args)
   {
 
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    }
-    catch (UnsupportedLookAndFeelException e) {
-    }
-    catch (ClassNotFoundException e) {
-    }
-    catch (InstantiationException e) {
-    }
-    catch (IllegalAccessException e) {
-    }
+    try {UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}
+    catch (UnsupportedLookAndFeelException e) {}
+    catch (ClassNotFoundException e) {}
+    catch (InstantiationException e) {}
+    catch (IllegalAccessException e) {}
 
-    (new Thread(new visual())).start();
+    new Thread(new visual()).start();
 
   }
 
   public visual (){
 
+    this.setLocation(300,300);
+    this.setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
+
     gen.addActionListener(this);
     sort.addActionListener(this);
+    plus.addActionListener(this);
+    minus.addActionListener(this);
 
-    sort.setEnabled(false);
 
+    draw1.setBackground(sky);
+    south.setBackground(sky);
+    gen.setBackground(sky);
+    sort.setBackground(sky);
     south.add(gen);
     south.add(sort);
+    sort.setEnabled(false);
+
+
+    south.add(plus);
+    south.add(minus);
     south.add(select);
+    plus.setBackground(sky);
+    minus.setBackground(sky);
+    select.setBackground(sky);
 
     main.setLayout(new BorderLayout());
-    south.setLayout(new GridLayout(1,3,0,2));
+    south.setLayout(new GridLayout(1,5,0,4));
 
     main.add(draw1,BorderLayout.CENTER);
     main.add(south,BorderLayout.SOUTH);
@@ -72,12 +96,8 @@ public class visual extends JFrame implements ActionListener,Runnable
     this.setSize(799,400);
     this.setVisible(true);
 
-    for (int i=0;i<size;i++)
-    {
-      Random r = new Random();
-      numbers[i] = r.nextInt(range);
-    }
 
+    this.setTitle("Sorting Visualizer Liam Crozier 2015");
   }
 
   public void run()
@@ -90,17 +110,27 @@ public class visual extends JFrame implements ActionListener,Runnable
       }
       catch (InterruptedException ex){}
 
+      if(gensort_i ==1)
+      {
+        gensort();
+        gensort_i=0;
+      }
+
+
       if (counter==1)
       {
+        for (int i=0;i<size;i++)
+        {
+          helper[i] =6000;
+        }
+        sort.setEnabled(false);
+        gen.setEnabled(false);
         if(select.getSelectedIndex()==0)
         {
           mergesort(0,size-1);
 
           mergesort(0,size-1);
-          for (int i=0;i<size;i++)
-          {
-            helper[i] =6000;
-          }
+
         }
         else if(select.getSelectedIndex()==1)
         {
@@ -110,6 +140,16 @@ public class visual extends JFrame implements ActionListener,Runnable
         {
           Bubble();
         }
+        else if(select.getSelectedIndex()==3)
+        {
+          DoubleBubble();
+        }
+        else if(select.getSelectedIndex()==4)
+        {
+          SelectEx();
+        }
+        sort.setEnabled(true);
+        gen.setEnabled(true);
       }
       counter = 0;
 
@@ -122,50 +162,85 @@ public class visual extends JFrame implements ActionListener,Runnable
   {
     if (e.getSource()==gen)
     {
-      for (int i=0;i<size;i++)
-      {
-        Random r = new Random();
-        numbers[i] = r.nextInt(range);
-      }
-      sort.setEnabled(true);
+      gensort_i=1;
+
     }
     else if (e.getSource()==sort)
     {
       counter = 1;
     }
-
+    else if(e.getSource()==minus)
+    {
+      sleep++;
+      minus.setText("Speed - ");
+      plus.setText("Speed + ");
+    }
+    else if(e.getSource()==plus&&sleep!=1)
+    {
+      sleep--;
+      plus.setText("Speed + ");
+      minus.setText("Speed - ");
+    }
+    if (sleep<3)
+    {
+      speed = "Fast";
+    }
+    else if (sleep<8)
+    {
+      speed = "Medium";
+    }
+    else if (sleep<16)
+    {
+      speed = "Slow";
+    }
+    else
+    {
+      speed = "A Long Time";
+    }
   }
 
   class MyDrawPanel extends JPanel
   {
 
     public void paintComponent(Graphics g) {
-
+      g.setColor(sky);
+      g.fillRect(0,0,799,400);
       Graphics2D g2 = (Graphics2D)g;
+
 
       for (int i=0;i<size;i++)
       {
-        g2.setColor(Color.BLACK);
+        g2.setColor(Color.WHITE);
         if (numbers[i]==helper[i])
           g2.setColor(Color.GREEN);
-        g2.drawLine(i*2+1,335-numbers[i],i*2+1,335);
-
+        g2.drawLine(i*2+1,335-numbers[i],i*2+1,337);
       }
+      g2.setColor(Color.RED);
+      g2.drawString(set[select.getSelectedIndex()],5,15);
+      g2.drawString(speed+" ("+sleep+" Mils)", 5, 30);
+
+      if(gensort_i==1||counter==1)
+        g2.drawString("Processing"+dots_t[dots], 5, 45);
 
     }
   }
 
   public void mergesort(int low, int high) {
     try
-      {
-        Thread.sleep(sleep);
-      }
-      catch (InterruptedException ex){}
+    {
+      Thread.sleep(sleep);
+    }
+    catch (InterruptedException ex){}
     repaint();
     if (low < high) {
       int middle = low + (high - low) / 2;
       mergesort(low, middle);
       mergesort(middle + 1, high);
+      dots++;
+      if (dots>2)
+      {
+        dots =0;
+      }
       try
       {
         Thread.sleep(sleep);
@@ -178,11 +253,11 @@ public class visual extends JFrame implements ActionListener,Runnable
 
   private void merge(int low, int middle, int high) {
     try
-      {
-        Thread.sleep(sleep);
-      }
-      catch (InterruptedException ex){}
-      repaint();
+    {
+      Thread.sleep(sleep);
+    }
+    catch (InterruptedException ex){}
+    repaint();
 
     for (int i = low; i <= high; i++) {
       helper[i] = numbers[i];
@@ -192,6 +267,11 @@ public class visual extends JFrame implements ActionListener,Runnable
     int j = middle + 1;
     int k = low;
     while (i <= middle && j <= high) {
+      dots++;
+      if (dots>2)
+      {
+        dots =0;
+      }
       if (helper[i] <= helper[j]) {
         numbers[k] = helper[i];
         i++;
@@ -202,11 +282,11 @@ public class visual extends JFrame implements ActionListener,Runnable
       k++;
     }
     try
-      {
-        Thread.sleep(sleep);
-      }
-      catch (InterruptedException ex){}
-      repaint();
+    {
+      Thread.sleep(sleep);
+    }
+    catch (InterruptedException ex){}
+    repaint();
     while (i <= middle) {
       numbers[k] = helper[i];
       k++;
@@ -220,10 +300,10 @@ public class visual extends JFrame implements ActionListener,Runnable
     int flag = 0;
 
     try
-      {
-        Thread.sleep(sleep);
-      }
-      catch (InterruptedException ex){}
+    {
+      Thread.sleep(sleep);
+    }
+    catch (InterruptedException ex){}
     repaint();
 
     if (lo >= hi) {
@@ -232,6 +312,11 @@ public class visual extends JFrame implements ActionListener,Runnable
     int pivot = a[lo];
 
     while (lo < hi) {
+      dots++;
+      if (dots>2)
+      {
+        dots =0;
+      }
       flag=0;
       while (lo<hi && flag==0) {
         hi--;
@@ -284,48 +369,169 @@ public class visual extends JFrame implements ActionListener,Runnable
   }
 
   public void Bubble(){
+    int x=0;
 
-      for (int m=size-1;m>=1;m--){
-
-      try
+    for (int m=size-1;m>=1;m--){
+      dots++;
+      if (dots>2)
       {
-        Thread.sleep(sleep);
+        dots =0;
       }
-      catch (InterruptedException ex){}
+      nextsize = 0;
       repaint();
       flag=0;
       for (int n=0;n<m;n++){
+        x++;
+        try{if(x>10){Thread.sleep(sleep);x=0;}}
+        catch (InterruptedException ex){}
+        repaint();
 
         if (numbers[n+1]<numbers[n]){
           temp=numbers[n+1];
-
 
           numbers[n+1]=numbers[n];
           numbers[n]=temp;
 
           repaint();
           nextsize++;
-          if (nextsize ==1000000000);
-          {
-            try
-          {
-            Thread.sleep(0);
-            nextsize = 0;
-          }
-          catch (InterruptedException ex){}
-          }
-
-
           flag=1;
           swaps = swaps+1;
-
-
         }
       }
       if (flag==0){
         m=0;
       }
     }
+  }
+  public void DoubleBubble()
+  {
+    boolean swapped = true;
+    int i = 0;
+    int j = numbers.length - 1;
+    int x=0;
+    while(i < j && swapped)
+    {
+
+
+
+      swapped = false;
+      for(int k = i; k < j; k++)
+      {
+        dots++;
+        if (dots>2)
+        {
+          dots =0;
+        }
+        if(numbers[k] > numbers[k + 1])
+        {
+          x++;
+          int temp = numbers[k];
+          try{if(x>10){Thread.sleep(sleep);x=0;}}
+          catch (InterruptedException ex){}
+          repaint();
+
+          numbers[k] = numbers[k + 1];
+          numbers[k + 1] = temp;
+          swapped = true;
+          swaps = swaps +1;
+
+
+        }
+      }
+      helper[j] = numbers[j];
+      j--;
+      if(swapped)
+      {
+        swapped = false;
+        for(int k = j; k > i; k--)
+        {
+          if(numbers[k] < numbers[k - 1])
+          {
+            int temp = numbers[k];
+            swaps = swaps +1;
+            x++;
+            try{if(x>10){Thread.sleep(sleep);x=0;}}
+            catch (InterruptedException ex){}
+            repaint();
+
+            numbers[k] = numbers[k - 1];
+            numbers[k - 1] = temp;
+            swapped = true;
+
+
+          }
+        }
+      }
+      helper[i] = numbers[i];
+      i++;
+
+    }
+  }
+  public  void SelectEx(){
+    int lowpos = 0;
+    int lowest = 0;
+    int x = 0;
+    for (int n=0;n<size;n++){
+      lowest=numbers[n];
+      for (int j=0;j<n+1;j++)
+      {
+        helper[j]=numbers[j];
+      }
+
+      lowpos=n;
+
+      for (int m=n+1;m<size;m++){
+        dots++;
+        if (dots>2)
+        {
+          dots =0;
+        }
+        x++;
+        try
+        {
+          if(x>30)
+          {
+            Thread.sleep(sleep);
+            x =0;
+          }
+        }
+        catch (InterruptedException ex){}
+        repaint();
+        if (numbers[m]<lowest){
+          lowest=numbers[m];
+          swaps = swaps +1;
+          lowpos=m;
+        }
+      }
+      temp=numbers[n];
+      numbers[n]=numbers[lowpos];
+      numbers[lowpos]=temp;
+      swaps = swaps +1;
+    }
+  }
+  public void gensort(){
+    sort.setEnabled(false);
+    for (int i=0;i<size;i++)
+    {
+      numbers[i]=0;
+    }
+    for (int i=0;i<size;i++)
+    {
+      dots++;
+      if (dots>2)
+      {
+        dots =0;
+      }
+      Random r = new Random();
+      numbers[i] = r.nextInt(range);
+      try
+      {
+        Thread.sleep(sleep);
+      }
+      catch (InterruptedException ex){}
+      repaint();
+    }
+    sort.setEnabled(true);
   }
 }
 
