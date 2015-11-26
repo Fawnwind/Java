@@ -61,6 +61,12 @@ public class visual extends JFrame implements ActionListener,Runnable
 
   public visual (){
 
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Image cursorImage = toolkit.getImage("moony.png");
+    Point cursorHotSpot = new Point(0,0);
+    Cursor customCursor = toolkit.createCustomCursor(cursorImage, cursorHotSpot, "Cursor");
+    this.setCursor(customCursor);
+
     this.setLocation(300,300);
     this.setIconImage(new ImageIcon(getClass().getResource("icon.png")).getImage());
 
@@ -185,11 +191,11 @@ public class visual extends JFrame implements ActionListener,Runnable
     {
       speed = "Fast";
     }
-    else if (sleep<8)
+    else if (sleep<6)
     {
       speed = "Medium";
     }
-    else if (sleep<16)
+    else if (sleep<10)
     {
       speed = "Slow";
     }
@@ -204,7 +210,7 @@ public class visual extends JFrame implements ActionListener,Runnable
 
     public void paintComponent(Graphics g) {
       g.setColor(sky);
-      g.fillRect(0,0,799,400);
+      g.fillRect(0,0,9000,9000);
       Graphics2D g2 = (Graphics2D)g;
 
 
